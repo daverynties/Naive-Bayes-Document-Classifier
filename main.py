@@ -2,6 +2,10 @@ from collections import defaultdict
 from collections import Counter
 from itertools import chain
 
+#==============================================================================
+# ###TRAINING
+# 
+#==============================================================================
 totalTrainingDocs = 0
 
 d = defaultdict(list)
@@ -39,4 +43,32 @@ for word in Vocabulary:
         if word in d[cls]:
             d[cls][word] = calculateProbability(cls, word)
             
+#==============================================================================
+# ###_CLASSIFICATION__###
+# 
+#==============================================================================
+#class_word = 'test'
+#class_value = 0.0
+
+#create nested dic of test docs to get unique words and count
+#count will be overrided to probability value for each class
+    #for each class
+        #for each word in test doc
+        #get first word for class validation
+            #if word in class
+                #get probability value and append to dict[class][word] value
+            #else
+                #probability value =  (float(1 / len(totalTrainingDocs)))
+                #log(probability value)
+                #append value to list
+        #get sum of all values in list
+        #if list summation is greater than previous
+            #class_top_value = new value
+            #class_prediction = new value
+    #if class_prediction = first_word
+        #correct_prediction + 1
+    #else
+        #incorrect_prediction + 1
     
+    
+        
