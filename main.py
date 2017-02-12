@@ -22,26 +22,44 @@ with open('trainingData.txt') as f:
 #get total unique words in all documents -- Vocabulary        
 Vocabulary = list(set(list(chain.from_iterable(class_word_prob.values()))))
 
+# baseball = Counter(class_word_prob['baseball'])
+# space = Counter(class_word_prob['space'])
+# medicine = Counter(class_word_prob['medicine'])
+#
+# list_unique = [a for a in baseball+medicine if (a not in baseball) or (a not in medicine)]
+
 #convert list to dictionary to remove duplicate words and get count
 for key in class_word_prob:
+    #class_word_prob[key] = set(list(class_word_prob[key]))
     class_word_prob[key] = Counter(class_word_prob[key])
+
+
+
     
 #calc probability function      
-def calculateProbability(cls, word):
+def calculateProbability(cls, word, found):
     
     vocabLength = len(Vocabulary)
     wordOccurance = class_word_prob[cls][word]
     classLength = len(class_word_prob[cls])
     
     #calculate Probability
-    probability = ((wordOccurance + 1) / (float(classLength) + vocabLength))    
-    return probability
+    if found:
+        probability = ((wordOccurance + 1) / (float(classLength) + vocabLength))
+    else:
+        probability = (1 / (float(classLength) + vocabLength))
+    return log(probability)
+
 #for every word in vocabulary, check occurances of each class and set value 
-#of current dictionary        
-for word in Vocabulary:      
-    for cls in class_word_prob:
-        if word in class_word_prob[cls]:
-            class_word_prob[cls][word] = calculateProbability(cls, word)
+#of current dictionary
+# for word in Vocabulary:
+#     for cls in class_word_prob:
+#         if word in class_word_prob[cls]:
+#             class_word_prob[cls][word] = calculateProbability(cls, word)
+#
+# for cls in class_word_prob:
+#     for word in class_word_prob[cls]:
+#
             
 #==============================================================================
 # ###_CLASSIFICATION__###
@@ -60,23 +78,45 @@ with open('testData.txt') as f:
         #grab first word for future comparison
         cls_value = testData.pop(0)
         #loop through classes for each word
+        max_sum_class = -10000000.00
+
         for cls in class_word_prob:
             word_probability_values = []
             for word in testData:
                 if word in class_word_prob[cls]:
-                     word_probability_values.append(log(class_word_prob[cls][word]))
-                     print("true")
+                    x = calculateProbability(cls, word, True)
+                    #print word, x
+                    word_probability_values.append(x)
                 else:
-                    word_probability_values.append(log(1 / float(class_doc_length[cls])))
-            if sum(word_probability_values) > max_sum_class:
-                max_sum_class = sum(word_probability_values)
+                    x = calculateProbability(cls, word, False)
+                    word_probability_values.append(x)
+
+            total_class_summation = sum(word_probability_values)
+
+            if total_class_summation > max_sum_class:
+                max_sum_class = total_class_summation
                 class_word = cls
-    if cls_value == class_word:    
-        correct_classification.append("TRUE")
-    else:
-        correct_classification.append("FALSE")
+
+        if cls_value == class_word:    
+            correct_classification.append("TRUE")
+        else:
+            correct_classification.append("FALSE")
     #correct_classification = list(set(correct_classification))
-        
+
+    total_values = len(correct_classification)
+    #print(total_values)
+    final_prediction = Counter(correct_classification)
+    total_true = final_prediction.get('TRUE')
+    total_false = final_prediction.get('FALSE')
+    #print(total_true)
+    #print total_false
+    #print final_prediction
+
+    accuracy_value = (float(total_true) / total_values)
+    #print(accuracy_value)
+
+print("\nClassification Accuracy: %.2f%%" % (round(accuracy_value, 4) * 100))
+
            
 
 
