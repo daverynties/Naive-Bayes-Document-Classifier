@@ -6,10 +6,17 @@ from math import log
 # ###_TRAINING_###
 #==============================================================================
 totalTrainingDocs = 0
+unique_full_words = []
 
 class_word_prob = defaultdict(list)
 class_doc_length = defaultdict(int)
 vocabDicts = {}
+
+def merge_two_dicts(x, y):
+    """Given two dicts, merge them into a new dict as a shallow copy."""
+    z = x.copy()
+    z.update(y)
+    return z
 
 with open('trainingData.txt') as f:
     for line in f.readlines():
@@ -26,9 +33,10 @@ for key in class_word_prob:
     #class_word_prob[key] = set(list(class_word_prob[key]))
     class_word_prob[key] = Counter(class_word_prob[key])
 
-# for cls in class_doc_length:
-#     for word in Vocabulary:
-#
+for cls in class_doc_length:
+    vocabDicts[cls] = Counter(Vocabulary)
+    vocabDicts[cls] = merge_two_dicts(vocabDicts[cls], class_word_prob[cls])
+
 
 #calc probability function      
 def calculateProbability(cls, word, found):
