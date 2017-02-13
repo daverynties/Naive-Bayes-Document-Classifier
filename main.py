@@ -39,17 +39,17 @@ for cls in class_doc_length:
 
 
 #calc probability function      
-def calculateProbability(cls, word, found):
+def calculateProbability(cls, word):
     
     vocabLength = len(Vocabulary)
-    wordOccurance = class_word_prob[cls][word]
+    wordOccurance = vocabDicts[cls][word]
     classLength = len(class_word_prob[cls])
     
     #calculate Probability
-    if found:
-        probability = ((wordOccurance + 1) / (float(classLength) + vocabLength))
-    else:
-        probability = (1 / (float(classLength) + vocabLength))
+   # if found:
+    probability = ((wordOccurance + 1) / (float(classLength) + vocabLength))
+   # else:
+       # probability = (1 / (float(classLength) + vocabLength))
     return (probability)
 
 def classValueCalculation(list):
@@ -79,16 +79,16 @@ with open('testData.txt') as f:
         #loop through classes for each word
         max_sum_class = -10000000.00
 
-        for cls in class_word_prob:
+        for cls in vocabDicts:
             word_probability_values = []
             for word in testData:
-                if word in class_word_prob[cls]:
-                    x = calculateProbability(cls, word, True)
+                #if word in vocabDicts[cls]:
+                x = calculateProbability(cls, word)
                     #print word, x
-                    word_probability_values.append(x)
-                else:
-                    x = calculateProbability(cls, word, False)
-                    word_probability_values.append(x)
+                word_probability_values.append(x)
+               # else:
+                  #  x = calculateProbability(cls, word, False)
+                  #  word_probability_values.append(x)
 
             prior_probability = (float(class_doc_length[cls]) / totalTrainingDocs)
             word_probability_values.insert(0, prior_probability)
@@ -105,7 +105,7 @@ with open('testData.txt') as f:
             correct_classification.append("FALSE")
             incorrect_classification.append(class_word)
             guess_classification.append(cls_value)
-            print('Guess: ' + class_word + '\nClassification: ' + cls_value)
+            #print('Guess: ' + class_word + '\nClassification: ' + cls_value)
 
     total_values = len(correct_classification)
     final_prediction = Counter(correct_classification)
