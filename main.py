@@ -2,9 +2,8 @@ from collections import defaultdict
 from collections import Counter
 from itertools import chain
 from math import log
-
 #==============================================================================
-###_TRAINING_###
+# ###_TRAINING_###
 #==============================================================================
 totalTrainingDocs = 0
 
@@ -27,6 +26,10 @@ for key in class_word_prob:
     #class_word_prob[key] = set(list(class_word_prob[key]))
     class_word_prob[key] = Counter(class_word_prob[key])
 
+# for cls in class_doc_length:
+#     for word in Vocabulary:
+#
+
 #calc probability function      
 def calculateProbability(cls, word, found):
     
@@ -39,14 +42,22 @@ def calculateProbability(cls, word, found):
         probability = ((wordOccurance + 1) / (float(classLength) + vocabLength))
     else:
         probability = (1 / (float(classLength) + vocabLength))
-    return log(probability)
+    return (probability)
 
+def classValueCalculation(list):
+    product = 0
+    for x in list:
+        x = log(x)
+        product += x
+    return product
             
 #==============================================================================
 ###_CLASSIFICATION__###
 #==============================================================================
 class_word = 'test'
 correct_classification = []
+guess_classification = []
+incorrect_classification = []
 max_sum_class = -10000000.00
 
 test_class_word_prob = defaultdict(list)
@@ -71,7 +82,10 @@ with open('testData.txt') as f:
                     x = calculateProbability(cls, word, False)
                     word_probability_values.append(x)
 
-            total_class_summation = sum(word_probability_values)
+            prior_probability = (float(class_doc_length[cls]) / totalTrainingDocs)
+            word_probability_values.insert(0, prior_probability)
+
+            total_class_summation = classValueCalculation(word_probability_values)
 
             if total_class_summation > max_sum_class:
                 max_sum_class = total_class_summation
@@ -81,11 +95,22 @@ with open('testData.txt') as f:
             correct_classification.append("TRUE")
         else:
             correct_classification.append("FALSE")
+            incorrect_classification.append(class_word)
+            guess_classification.append(cls_value)
+            print('Guess: ' + class_word + '\nClassification: ' + cls_value)
 
     total_values = len(correct_classification)
     final_prediction = Counter(correct_classification)
     total_true = final_prediction.get('TRUE')
     total_false = final_prediction.get('FALSE')
+
+    incorrect_classification = Counter(incorrect_classification)
+    guess_classification = Counter(guess_classification)
+
+    print'----------------------'
+    print incorrect_classification
+    print guess_classification
+    print'----------------------'
 
     accuracy_value = (float(total_true) / total_values)
     #print(accuracy_value)
