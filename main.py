@@ -2,15 +2,28 @@ from collections import defaultdict
 from collections import Counter
 from itertools import chain
 from math import log
+import numpy as np
+import matplotlib.pyplot as plt
+
+plt.rcdefaults()
+
 #==============================================================================
 # ###_TRAINING_###
 #==============================================================================
 totalTrainingDocs = 0
+
 unique_full_words = []
+miss_class = []
+correct_classification = []
+guess_classification = []
+incorrect_classification = []
 
 class_word_prob = defaultdict(list)
 class_doc_length = defaultdict(int)
 vocabDicts = {}
+class_word = 'test'
+
+max_sum_class = -10000.00
 
 def merge_two_dicts(x, y):
     """Given two dicts, merge them into a new dict as a shallow copy."""
@@ -37,20 +50,16 @@ for cls in class_doc_length:
     vocabDicts[cls] = Counter(Vocabulary)
     vocabDicts[cls] = merge_two_dicts(vocabDicts[cls], class_word_prob[cls])
 
-
 #calc probability function      
-def calculateProbability(cls, word, found):
+def calculateProbability(cls, word):
     
     vocabLength = len(Vocabulary)
     wordOccurance = class_word_prob[cls][word]
     classLength = len(class_word_prob[cls])
     
     #calculate Probability
-    if found:
-        probability = ((wordOccurance + 1) / (float(classLength) + vocabLength))
-    else:
-        probability = (1 / (float(classLength) + vocabLength))
-    return (probability)
+    probability = ((wordOccurance + 1) / (float(classLength) + vocabLength))
+    return probability
 
 def classValueCalculation(list):
     product = 0
@@ -62,11 +71,6 @@ def classValueCalculation(list):
 #==============================================================================
 ###_CLASSIFICATION__###
 #==============================================================================
-class_word = 'test'
-correct_classification = []
-guess_classification = []
-incorrect_classification = []
-max_sum_class = -10000000.00
 
 test_class_word_prob = defaultdict(list)
 
@@ -77,18 +81,13 @@ with open('testData.txt') as f:
         #grab first word for future comparison
         cls_value = testData.pop(0)
         #loop through classes for each word
-        max_sum_class = -10000000.00
+        max_sum_class = -10000.00
 
-        for cls in class_word_prob:
+        for cls in vocabDicts:
             word_probability_values = []
             for word in testData:
-                if word in class_word_prob[cls]:
-                    x = calculateProbability(cls, word, True)
-                    #print word, x
-                    word_probability_values.append(x)
-                else:
-                    x = calculateProbability(cls, word, False)
-                    word_probability_values.append(x)
+                x = calculateProbability(cls, word)
+                word_probability_values.append(x)
 
             prior_probability = (float(class_doc_length[cls]) / totalTrainingDocs)
             word_probability_values.insert(0, prior_probability)
@@ -103,24 +102,29 @@ with open('testData.txt') as f:
             correct_classification.append("TRUE")
         else:
             correct_classification.append("FALSE")
-            incorrect_classification.append(class_word)
-            guess_classification.append(cls_value)
-            print('Guess: ' + class_word + '\nClassification: ' + cls_value)
+            miss_class.append('G: {} --> A: {}'.format(class_word, cls_value))
 
     total_values = len(correct_classification)
     final_prediction = Counter(correct_classification)
     total_true = final_prediction.get('TRUE')
     total_false = final_prediction.get('FALSE')
+    miss_class = Counter(miss_class)
 
-    incorrect_classification = Counter(incorrect_classification)
-    guess_classification = Counter(guess_classification)
+    for k, v in miss_class.items():
+        if v < 30:
+            del miss_class[k]
 
-    print'----------------------'
-    print incorrect_classification
-    print guess_classification
-    print'----------------------'
+    labels, values = zip(*miss_class.items())
 
     accuracy_value = (float(total_true) / total_values)
-    #print(accuracy_value)
+
+    indexes = np.arange(len(labels))
+    width = 1
+
+    plt.tick_params(labelsize=10)
+    plt.barh(indexes, values, width)
+    plt.yticks(indexes + width * 0.5, labels)
+    plt.show()
 
 print("\nClassification Accuracy: %.2f%%" % (round(accuracy_value, 4) * 100))
+
