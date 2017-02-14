@@ -4,6 +4,7 @@ from itertools import chain
 from math import log
 import numpy as np
 import matplotlib.pyplot as plt
+import datetime
 
 plt.rcdefaults()
 
@@ -41,6 +42,7 @@ with open('trainingData.txt') as f:
 #get total unique words in all documents -- Vocabulary        
 Vocabulary = list(set(list(chain.from_iterable(class_word_prob.values()))))
 
+start_time = datetime.datetime.now()
 #convert list to dictionary to remove duplicate words and get count
 for key in class_word_prob:
     #class_word_prob[key] = set(list(class_word_prob[key]))
@@ -109,22 +111,12 @@ with open('testData.txt') as f:
     total_true = final_prediction.get('TRUE')
     total_false = final_prediction.get('FALSE')
     miss_class = Counter(miss_class)
-
-    for k, v in miss_class.items():
-        if v < 30:
-            del miss_class[k]
-
-    labels, values = zip(*miss_class.items())
-
     accuracy_value = (float(total_true) / total_values)
+    total_time = datetime.datetime.now() - start_time
 
-    indexes = np.arange(len(labels))
-    width = 1
+    milli = int(total_time.total_seconds() * 1000)
 
-    plt.tick_params(labelsize=10)
-    plt.barh(indexes, values, width)
-    plt.yticks(indexes + width * 0.5, labels)
-    plt.show()
+    print("\nClassification Accuracy: %.2f%%" % (round(accuracy_value, 4) * 100))
+    print('Execution Time: %i Milliseconds' % milli)
 
-print("\nClassification Accuracy: %.2f%%" % (round(accuracy_value, 4) * 100))
 
