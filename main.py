@@ -54,20 +54,12 @@ for cls in class_doc_length:
 def calculateProbability(cls, word):
     
     vocabLength = len(Vocabulary)
-    wordOccurance = vocabDicts[cls][word]
+    wordOccurance = class_word_prob[cls][word]
     classLength = len(class_word_prob[cls])
-    
+
     #calculate Probability
-<<<<<<< HEAD
     probability = ((wordOccurance + 1) / (float(classLength) + vocabLength))
     return probability
-=======
-   # if found:
-    probability = ((wordOccurance + 1) / (float(classLength) + vocabLength))
-   # else:
-       # probability = (1 / (float(classLength) + vocabLength))
-    return (probability)
->>>>>>> fd4157a2d2f9f1c03d66139c65a94474490f0a3f
 
 def classValueCalculation(list):
     product = 0
@@ -75,7 +67,7 @@ def classValueCalculation(list):
         x = log(x)
         product += x
     return product
-            
+
 #==============================================================================
 ###_CLASSIFICATION__###
 #==============================================================================
@@ -83,7 +75,7 @@ def classValueCalculation(list):
 test_class_word_prob = defaultdict(list)
 
 with open('testData.txt') as f:
-    for line in f.readlines():      
+    for line in f.readlines():
         #class_doc_length[(line.split(' ', 1)[0])] += 1
         testData = line.split()
         #grab first word for future comparison
@@ -94,18 +86,8 @@ with open('testData.txt') as f:
         for cls in vocabDicts:
             word_probability_values = []
             for word in testData:
-<<<<<<< HEAD
                 x = calculateProbability(cls, word)
                 word_probability_values.append(x)
-=======
-                #if word in vocabDicts[cls]:
-                x = calculateProbability(cls, word)
-                    #print word, x
-                word_probability_values.append(x)
-               # else:
-                  #  x = calculateProbability(cls, word, False)
-                  #  word_probability_values.append(x)
->>>>>>> fd4157a2d2f9f1c03d66139c65a94474490f0a3f
 
             prior_probability = (float(class_doc_length[cls]) / totalTrainingDocs)
             word_probability_values.insert(0, prior_probability)
@@ -116,17 +98,11 @@ with open('testData.txt') as f:
                 max_sum_class = total_class_summation
                 class_word = cls
 
-        if cls_value == class_word:    
+        if cls_value == class_word:
             correct_classification.append("TRUE")
         else:
             correct_classification.append("FALSE")
-<<<<<<< HEAD
             miss_class.append('G: {} --> A: {}'.format(class_word, cls_value))
-=======
-            incorrect_classification.append(class_word)
-            guess_classification.append(cls_value)
-            #print('Guess: ' + class_word + '\nClassification: ' + cls_value)
->>>>>>> fd4157a2d2f9f1c03d66139c65a94474490f0a3f
 
     total_values = len(correct_classification)
     final_prediction = Counter(correct_classification)
